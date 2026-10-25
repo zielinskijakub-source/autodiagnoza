@@ -1,0 +1,520 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Autodiagnoza Workplace by JLL</title>
+<meta name="description" content="Krótka autodiagnoza biura dla osób z administracji: 24 pytania, wynik od razu na ekranie i zaproszenie do bezpłatnej diagnozy JLL.">
+<meta name="robots" content="noindex">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=IBM+Plex+Mono:wght@400;500&family=Source+Sans+3:wght@400;600&display=swap">
+<style>
+/* Układ: jedna kolumna (max 720px). Hero → 3 kroki → 6 obszarów → puls biura → wynik z wykresem → zgłoszenie. */
+:root {
+  --bg: #F3F5F7;
+  --surface: #FFFFFF;
+  --fg: #101C26;
+  --muted: #56677A;
+  --line: #D8DFE6;
+  --accent: #2438C9;
+  --accent-fg: #FFFFFF;
+  --accent-soft: #E5E9FB;
+  --warm: #D9480F;
+  --warm-soft: #FCE9E0;
+  --hero-bg: #16217A;
+  --hero-fg: #FFFFFF;
+  --hero-muted: #C5CCF5;
+  --f-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body: "Source Sans 3", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0C141C; --surface: #142029; --fg: #E9EEF3; --muted: #93A3B3; --line: #25343F;
+    --accent: #8FA0FF; --accent-fg: #0C141C; --accent-soft: #1C2750; --warm: #FF8A5C; --warm-soft: #3A2218;
+    --hero-bg: #1A2468; --hero-fg: #F4F6FF; --hero-muted: #B4BEF5;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0C141C; --surface: #142029; --fg: #E9EEF3; --muted: #93A3B3; --line: #25343F;
+  --accent: #8FA0FF; --accent-fg: #0C141C; --accent-soft: #1C2750; --warm: #FF8A5C; --warm-soft: #3A2218;
+  --hero-bg: #1A2468; --hero-fg: #F4F6FF; --hero-muted: #B4BEF5;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; background: var(--bg); color: var(--fg); font-family: var(--f-body); font-size: 17px; line-height: 1.5;
+  padding-block: 16px 64px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.wrap { max-width: 720px; margin: 0 auto; }
+h1, h2, h3 { font-family: var(--f-display); text-wrap: balance; line-height: 1.12; margin: 0; }
+p { margin: 0; }
+.eyebrow { font-family: var(--f-mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+
+/* Hero */
+.hero { position: relative; overflow: hidden; background: var(--hero-bg); color: var(--hero-fg); border-radius: 16px; padding: 30px 24px 26px; display: grid; gap: 14px; }
+.hero::before { content: ""; position: absolute; inset: 0; background: repeating-linear-gradient(115deg, transparent 0 46px, rgba(255,255,255,.05) 46px 48px); pointer-events: none; }
+.hero > * { position: relative; }
+.hero .eyebrow { color: var(--hero-muted); }
+.hero h1 { font-size: clamp(32px, 7.4vw, 50px); font-weight: 700; letter-spacing: -.02em; }
+.hero .lede { font-size: 18px; color: var(--hero-muted); max-width: 52ch; }
+.hero .lede b { color: var(--hero-fg); font-weight: 600; }
+.facts { display: flex; flex-wrap: wrap; gap: 8px 22px; font-family: var(--f-mono); font-size: 13px; padding-top: 6px; }
+.facts span::before { content: "→ "; color: var(--hero-muted); }
+
+.steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 14px; }
+.step { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 14px; display: grid; gap: 4px; align-content: start; }
+.step i { font-style: normal; font-family: var(--f-mono); font-size: 12px; color: var(--accent); }
+.step b { font-family: var(--f-display); font-size: 17px; line-height: 1.2; }
+.step span { font-size: 14px; color: var(--muted); line-height: 1.35; }
+
+/* Pasek postępu */
+.progress { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--bg); padding: 10px 0; margin-top: 8px; border-bottom: 1px solid var(--line); display: flex; align-items: center; gap: 12px; font-family: var(--f-mono); font-size: 12px; color: var(--muted); }
+.progress .track { flex: 1; height: 6px; background: var(--line); border-radius: 3px; overflow: hidden; }
+.progress .fill { height: 100%; width: 0; background: var(--accent); transition: width .25s; }
+
+/* Obszary */
+section.area, section.pulse { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 20px 18px 4px; margin-top: 18px; }
+section.pulse { border-color: var(--accent); }
+.area-head { display: grid; grid-template-columns: auto 1fr; gap: 4px 14px; align-items: center; margin-bottom: 6px; }
+.badge { width: 38px; height: 38px; border-radius: 50%; background: var(--accent-soft); color: var(--accent); display: grid; place-items: center; font-family: var(--f-mono); font-weight: 500; font-size: 15px; }
+.area-head h2 { font-size: 24px; font-weight: 700; }
+.area-head .sub { grid-column: 2; color: var(--muted); font-size: 15px; margin-top: -2px; }
+.q { padding: 16px 0; border-top: 1px solid var(--line); }
+.q > p { margin: 0 0 10px; }
+.scale { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+.scale label, .opts label { position: relative; }
+.scale input, .opts input { position: absolute; opacity: 0; inset: 0; width: 100%; height: 100%; margin: 0; cursor: pointer; }
+.scale span { display: grid; place-items: center; height: 46px; border: 1px solid var(--line); border-radius: 8px; font-family: var(--f-mono); font-weight: 500; background: var(--bg); color: var(--fg); }
+.scale input:checked + span { background: var(--accent); border-color: var(--accent); color: var(--accent-fg); }
+.scale input:focus-visible + span, .opts input:focus-visible + span { outline: 3px solid var(--accent); outline-offset: 2px; }
+.ends { display: flex; justify-content: space-between; margin-top: 5px; font-size: 13px; color: var(--muted); }
+.opts { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+.opts span { display: grid; place-items: center; text-align: center; min-height: 46px; padding: 6px 4px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); font-size: 14px; line-height: 1.2; }
+.opts input:checked + span { background: var(--accent); border-color: var(--accent); color: var(--accent-fg); font-weight: 600; }
+.pulse .intro { color: var(--muted); font-size: 15px; margin: 2px 0 8px; max-width: 58ch; }
+
+/* Wynik */
+section.result, section.submit { margin-top: 36px; }
+section.result h2, section.submit h2 { font-size: clamp(26px, 5.5vw, 34px); margin: 6px 0 8px; }
+.lead { color: var(--muted); margin: 0 0 16px; max-width: 60ch; }
+.resultgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; align-items: stretch; }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 16px 18px; min-width: 0; }
+.overall .big { font-family: var(--f-display); font-size: 68px; font-weight: 700; line-height: 1; font-variant-numeric: tabular-nums; }
+.overall .big small { font-size: 22px; color: var(--muted); font-weight: 500; }
+.overall b.t { display: block; font-family: var(--f-display); font-size: 20px; margin-top: 8px; }
+.overall .meta { color: var(--muted); font-size: 15px; margin-top: 4px; }
+.pulsebox { margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--line); }
+.pulsebox .row { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; font-family: var(--f-mono); font-size: 13px; color: var(--muted); }
+.pulsebox .row b { color: var(--fg); font-weight: 500; }
+.radar { display: block; width: 100%; height: auto; max-width: 380px; margin: 0 auto; }
+.radar .ring { fill: none; stroke: var(--line); stroke-width: 1; }
+.radar .axis { stroke: var(--line); stroke-width: 1; }
+.radar .area { fill: var(--accent); fill-opacity: .16; stroke: var(--accent); stroke-width: 2; stroke-linejoin: round; }
+.radar .dot { fill: var(--accent); stroke: var(--surface); stroke-width: 2; }
+.radar text { fill: var(--muted); font-family: var(--f-body); font-size: 12.5px; }
+.radar text.tick { font-family: var(--f-mono); font-size: 10px; }
+.insight { margin-top: 14px; padding: 14px 16px; border-left: 3px solid var(--accent); background: var(--accent-soft); border-radius: 0 8px 8px 0; }
+.res { margin-top: 12px; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 14px 18px; }
+.res.top { border-color: var(--warm); }
+.res .head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px 12px; flex-wrap: wrap; }
+.res h3 { font-size: 19px; }
+.res .val { font-family: var(--f-mono); font-size: 13px; font-variant-numeric: tabular-nums; color: var(--muted); }
+.bar { height: 10px; background: var(--line); border-radius: 5px; margin: 10px 0 0; overflow: hidden; }
+.bar i { display: block; height: 100%; width: 0; background: var(--accent); border-radius: 5px; transition: width .3s; }
+.res.top .bar i { background: var(--warm); }
+.tag { font-family: var(--f-mono); font-size: 11px; letter-spacing: .06em; text-transform: uppercase; background: var(--warm-soft); color: var(--warm); padding: 3px 8px; border-radius: 4px; }
+.res details { margin-top: 10px; }
+.res summary { cursor: pointer; font-size: 15px; color: var(--accent); font-weight: 600; padding: 4px 0; }
+.res summary:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+.res .think { margin: 6px 0 6px; font-weight: 600; }
+.res .data { font-size: 15px; color: var(--muted); }
+.res .data b { color: var(--fg); font-weight: 600; }
+.note { margin-top: 16px; font-size: 15px; color: var(--muted); }
+
+/* Formularz */
+.form { display: grid; gap: 14px; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 20px 18px; }
+.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.form label.f { display: grid; gap: 5px; font-size: 14px; color: var(--muted); min-width: 0; }
+.form input[type=text], .form input[type=email], .form input[type=number], .form textarea {
+  width: 100%; font: inherit; font-size: 17px; color: var(--fg); background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px;
+}
+.form textarea { min-height: 84px; resize: vertical; }
+.form input:focus-visible, .form textarea:focus-visible { outline: 3px solid var(--accent); outline-offset: 1px; }
+.hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+.consent { display: grid; grid-template-columns: auto 1fr; gap: 10px; align-items: start; font-size: 14px; color: var(--muted); }
+.consent input { width: 20px; height: 20px; margin: 2px 0 0; accent-color: var(--accent); }
+.consent a { color: var(--accent); }
+.btn { font: inherit; font-weight: 600; background: var(--accent); color: var(--accent-fg); border: 0; border-radius: 10px; padding: 14px 22px; cursor: pointer; }
+.btn:focus-visible { outline: 3px solid var(--fg); outline-offset: 2px; }
+.btn[disabled] { opacity: .45; cursor: not-allowed; }
+.btn.ghost { background: transparent; color: var(--fg); border: 1px solid var(--line); }
+.actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.hint { font-family: var(--f-mono); font-size: 12px; color: var(--muted); }
+.thanks { margin-top: 14px; display: grid; gap: 12px; }
+.thanks .ok { font-family: var(--f-display); font-size: 24px; font-weight: 700; }
+pre.summary { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; background: var(--bg); border: 1px dashed var(--line); border-radius: 8px; padding: 14px; font-family: var(--f-mono); font-size: 13px; line-height: 1.55; }
+footer { margin-top: 36px; padding-top: 16px; border-top: 1px solid var(--line); font-size: 13px; color: var(--muted); }
+[hidden] { display: none !important; }
+section { scroll-margin-top: 56px; }
+@media (max-width: 600px) {
+  .resultgrid { grid-template-columns: 1fr; }
+  .steps { grid-template-columns: 1fr; }
+  .step { grid-template-columns: auto 1fr; gap: 2px 10px; }
+  .step i { grid-row: span 2; align-self: center; }
+  .opts { grid-template-columns: 1fr 1fr; }
+  .row2 { grid-template-columns: 1fr; }
+  .hero { padding: 24px 18px 22px; }
+}
+@media (prefers-reduced-motion: reduce) { .bar i, .progress .fill { transition: none; } }
+</style>
+
+</head>
+<body>
+<div class="wrap">
+  <header class="hero">
+    <div class="eyebrow">Autodiagnoza Workplace by JLL</div>
+    <h1>Biuro to nie sprint, tylko maraton. Jak się Wam biegnie?</h1>
+    <p class="lede">Karta autodiagnozy dla osób, które na co dzień dbają o biuro. <b>Pierwszy pomiar, nie wyrok:</b> pokaże, co w Waszym biurze działa dobrze, gdzie jest zapas do poprawy i jak często sprawdzacie, co się naprawdę dzieje.</p>
+    <div class="facts"><span>24 krótkie pytania</span><span>ok. 8 minut</span><span>wynik od razu na ekranie</span></div>
+  </header>
+
+  <div class="steps" aria-label="Jak to działa">
+    <div class="step"><i>01</i><b>Oceń 6 obszarów</b><span>18 stwierdzeń, skala od 1 do 5.</span></div>
+    <div class="step"><i>02</i><b>Sprawdź puls biura</b><span>Kiedy ostatnio badaliście swoje biuro.</span></div>
+    <div class="step"><i>03</i><b>Zobacz wynik</b><span>Mapa mocnych stron i miejsce, od którego warto zacząć.</span></div>
+  </div>
+
+  <div class="progress" aria-live="polite"><span id="pcount">0 / 24</span><div class="track"><div class="fill" id="pfill"></div></div></div>
+
+  <div id="areas"></div>
+  <div id="pulse"></div>
+
+  <section class="result" id="resultSec">
+    <div class="eyebrow">Wynik</div>
+    <h2>Kondycja Waszego biura</h2>
+    <p class="lead">Wynik liczy się na bieżąco. 100 oznacza, że w danym obszarze wszystko działa tak, jak powinno. Dwa najniższe obszary to dobre miejsce, od którego zaczyna się rozmowa o zmianach.</p>
+    <div class="resultgrid">
+      <div class="panel overall" id="overall"></div>
+      <div class="panel" id="radarBox"></div>
+    </div>
+    <div class="insight" id="insight" hidden></div>
+    <div id="results"></div>
+    <p class="note">Karta pokazuje sześć obszarów na poziomie odczucia i doświadczenia. Pełna diagnoza miejsca pracy JLL sprawdza biuro pod kątem 100 aspektów i opiera się na danych oraz obserwacji, a nie na opinii jednej osoby.</p>
+  </section>
+
+  <section class="submit" id="submitSec">
+    <div class="eyebrow">Kolejny krok</div>
+    <h2>Zgłoś biuro do bezpłatnej diagnozy JLL</h2>
+    <p class="lead">Każdy, kto wypełni kartę i zostawi dane, dostanie od nas zaproszenie do bezpłatnej diagnozy swojego biura: oceny miejsca pracy pod kątem 100 aspektów wraz z pełnym raportem.</p>
+    <form class="form" id="form" novalidate>
+      <div class="row2">
+        <label class="f" for="fname">Imię i nazwisko<input type="text" id="fname" autocomplete="name"></label>
+        <label class="f" for="fcompany">Firma<input type="text" id="fcompany" autocomplete="organization"></label>
+      </div>
+      <div class="row2">
+        <label class="f" for="fmail">E-mail służbowy<input type="email" id="fmail" autocomplete="email"></label>
+        <label class="f" for="fcity">Lokalizacja biura (opcjonalnie)<input type="text" id="fcity"></label>
+      </div>
+      <div class="row2">
+        <label class="f" for="farea">Powierzchnia biura w m² (opcjonalnie)<input type="number" id="farea" inputmode="numeric" min="0"></label>
+        <label class="f" for="fpeople">Liczba osób w biurze (opcjonalnie)<input type="number" id="fpeople" inputmode="numeric" min="0"></label>
+      </div>
+      <label class="f" for="fchange">Jedna rzecz, którą chcielibyście zmienić w biurze (opcjonalnie)<textarea id="fchange"></textarea></label>
+      <div class="hp" aria-hidden="true"><label>Nie wypełniaj tego pola<input type="text" id="fweb" tabindex="-1" autocomplete="off"></label></div>
+      <label class="consent" for="fconsent"><input type="checkbox" id="fconsent"><span id="consentText"></span></label>
+      <div class="actions">
+        <button class="btn" type="submit" id="sendBtn" disabled>Wyślij zgłoszenie</button>
+        <span class="hint" id="formhint">Wymagane: imię i nazwisko, firma, e-mail i zgoda.</span>
+      </div>
+    </form>
+    <div class="thanks panel" id="thanks" hidden>
+      <div class="ok" id="thanksTitle">Dziękujemy!</div>
+      <p id="thanksText"></p>
+      <pre class="summary" id="summary" tabindex="0"></pre>
+      <div class="actions">
+        <button class="btn ghost" type="button" id="copyBtn">Kopiuj podsumowanie</button>
+        <span class="hint" id="copyhint"></span>
+      </div>
+    </div>
+  </section>
+
+  <footer>Karta przygotowana przez zespół Workplace Strategy &amp; Change Management, JLL. Odpowiedzi zostają w Twojej przeglądarce, dopóki sam ich nie wyślesz przyciskiem „Wyślij zgłoszenie”.</footer>
+</div>
+
+<script>
+(function () {
+  /* ====== KONFIGURACJA (do uzupełnienia przy publikacji) ====== */
+  var ENDPOINT = "";            // adres, na który strona wyśle zgłoszenie (POST, JSON). Puste = tylko podsumowanie do skopiowania.
+  var PRIVACY_URL = "";         // link do informacji o przetwarzaniu danych (opcjonalnie)
+  var CONSENT_TEXT = "Wyrażam zgodę na kontakt w sprawie bezpłatnej diagnozy miejsca pracy oraz na przetwarzanie podanych danych i wyników karty w tym celu. Podanie danych jest dobrowolne.";
+  /* ============================================================ */
+
+  var AREAS = [
+    { id: "cisza", t: "Cisza i akustyka", short: "Cisza", s: "Czy da się tu pracować głową?",
+      q: ["Mamy w biurze miejsce, w którym naprawdę można pracować w ciszy, i ludzie z niego korzystają.",
+          "Hałas rozmów i telefonów rzadko przeszkadza w pracy wymagającej skupienia.",
+          "Wiemy, jak wygląda akustyka w naszych strefach (mierzyliśmy ją lub regularnie pytamy pracowników)."],
+      think: "Ile pracy wymagającej skupienia dzieje się dziś w biurze, a ile w domu?",
+      data: "wykorzystanie stref ciszy w ciągu dnia, pomiar poziomu dźwięku w godzinach szczytu, opinie z ankiety o hałasie" },
+    { id: "sale", t: "Sale i spotkania", short: "Sale", s: "Czy przestrzeń pasuje do tego, jak się spotykamy?",
+      q: ["Rezerwacje sal zgadzają się z tym, co dzieje się potem: sale nie stoją puste ani zajęte bez powodu.",
+          "Mamy małe, zamknięte miejsca do rozmów online i rozmów jeden na jeden.",
+          "Wielkość i układ naszych sal odpowiada temu, jak ludzie naprawdę się spotykają."],
+      think: "Jak liczne są typowe spotkania u Was i czy sale są pod to zaprojektowane?",
+      data: "rezerwacje a faktyczna obecność, liczba uczestników spotkań, udział rozmów online prowadzonych z biurek" },
+    { id: "rytm", t: "Rytm dnia", short: "Rytm", s: "Czy w ciągu dnia jest miejsce na oddech?",
+      q: ["Ludzie mają w ciągu dnia miejsce i moment na krótki reset poza biurkiem.",
+          "Wiemy, w jakich godzinach i dniach biuro jest najbardziej obłożone.",
+          "Spotkania zostawiają ludziom chwilę oddechu między sobą."],
+      think: "Gdzie w biurze ktoś może zrobić 10 minut przerwy i wrócić do pracy w lepszej formie?",
+      data: "obłożenie biura godzina po godzinie, przerwy między spotkaniami w kalendarzach, wykorzystanie stref resetu" },
+    { id: "obecnosc", t: "Obecność i dni w biurze", short: "Obecność", s: "Czy ludzie wiedzą, po co przychodzą?",
+      q: ["W dni szczytu wystarcza miejsc przy biurkach, na parkingu i w kantynie.",
+          "W dni niskiej frekwencji biuro jest nadal przyjemnym miejscem do pracy.",
+          "Pracownicy wiedzą, po co przychodzą do biura w konkretny dzień."],
+      think: "Czy dzień w biurze ma cel, którego nie da się osiągnąć w domu?",
+      data: "frekwencja dzień po dniu, zajętość biurek i parkingu, powody przyjścia zebrane od pracowników" },
+    { id: "uslugi", t: "Usługi i codzienne sprawy", short: "Usługi", s: "Ile energii pochłania drobiazg?",
+      q: ["Proste sprawy (zgłoszenie, awaria, zamówienie) załatwiamy jednym kanałem, który wszyscy znają.",
+          "Zespół administracji ma czas na planowanie, a nie tylko na reagowanie.",
+          "Pracownicy wiedzą, kiedy dostaną odpowiedź na zgłoszenie."],
+      think: "Jaką część dnia Waszego zespołu zajmują sprawy, które mogłyby załatwić się same?",
+      data: "liczba zgłoszeń tygodniowo, kanały zgłoszeń, czas reakcji i rozwiązania, powtarzalne tematy" },
+    { id: "narzedzia", t: "Narzędzia i zmiana", short: "Narzędzia", s: "Czy narzędzia pomagają i czy zmiany są zrozumiałe?",
+      q: ["Narzędzia w biurze (rezerwacje, aplikacje, sprzęt w salach) działają i ułatwiają dzień.",
+          "Wiemy, z których narzędzi ludzie faktycznie korzystają.",
+          "Zmiany w biurze wprowadzamy tak, że pracownicy wiedzą, co się zmienia i dlaczego, i mają na to wpływ."],
+      think: "Które narzędzie oszczędza czas, a które tylko go przesuwa?",
+      data: "adopcja narzędzi, czas od wejścia do sali do startu spotkania, liczba aplikacji potrzebnych do jednej czynności" }
+  ];
+  var PULSE_Q = [
+    "zrobiliście obchód biura w różnych porach dnia, patrząc oczami użytkownika",
+    "sprawdziliście, jak naprawdę wykorzystywane są biurka i sale (dane albo liczenie na miejscu)",
+    "rozmawialiście z kluczowymi użytkownikami biura o tym, co im w nim pomaga, a co przeszkadza",
+    "przejrzeliście powtarzające się zgłoszenia i uwagi, szukając wzorców",
+    "zmierzyliście albo zapytaliście o komfort: akustykę, temperaturę, światło",
+    "sprawdziliście, czy ostatnia zmiana w biurze zadziałała tak, jak zakładaliście"
+  ];
+  var PULSE_OPTS = [["4", "w ostatnim tygodniu"], ["3", "w ostatnim miesiącu"], ["2", "w ostatnim kwartale"], ["1", "dawniej lub nigdy"]];
+  var TOTAL = AREAS.length * 3 + PULSE_Q.length;
+  var LS = "karta-autodiagnozy-v2";
+  var state = { a: {}, p: {}, f: {} };
+  try { var raw = localStorage.getItem(LS); if (raw) { var pr = JSON.parse(raw); if (pr && pr.a && pr.p) state = pr; } } catch (e) {}
+
+  function $(id) { return document.getElementById(id); }
+  function save() { try { localStorage.setItem(LS, JSON.stringify(state)); } catch (e) {} }
+  function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;"); }
+  var params = new URLSearchParams(location.search);
+  var SRC = (params.get("src") || "").slice(0, 60);
+
+  // ---- Budowa obszarów
+  var html = "";
+  AREAS.forEach(function (a, ai) {
+    html += '<section class="area"><div class="area-head"><div class="badge">' + (ai + 1) + '</div><h2>' + a.t + '</h2><p class="sub">' + a.s + '</p></div>';
+    a.q.forEach(function (q, qi) {
+      var key = a.id + "-" + qi;
+      html += '<div class="q" role="group" aria-label="' + esc(q) + '"><p>' + q + '</p><div class="scale">';
+      for (var v = 1; v <= 5; v++) {
+        html += '<label><input type="radio" name="' + key + '" value="' + v + '"' + (state.a[key] === v ? " checked" : "") + '><span>' + v + '</span></label>';
+      }
+      html += '</div><div class="ends"><span>1 · nie u nas</span><span>5 · dokładnie tak</span></div></div>';
+    });
+    html += '</section>';
+  });
+  $("areas").innerHTML = html;
+
+  // ---- Puls biura
+  var ph = '<section class="pulse"><div class="area-head"><div class="badge">♥</div><h2>Puls biura</h2><p class="sub">Jak często sprawdzacie, co się dzieje</p></div><p class="intro">Tu nie ma dobrych i złych odpowiedzi. Zaznacz, kiedy ostatnio faktycznie to zrobiliście.</p>';
+  PULSE_Q.forEach(function (q, qi) {
+    var key = "p-" + qi;
+    ph += '<div class="q" role="group" aria-label="Kiedy ostatnio ' + esc(q) + '?"><p>Kiedy ostatnio ' + q + '?</p><div class="opts">';
+    PULSE_OPTS.forEach(function (o) {
+      ph += '<label><input type="radio" name="' + key + '" value="' + o[0] + '"' + (state.p[key] === parseInt(o[0], 10) ? " checked" : "") + '><span>' + o[1] + '</span></label>';
+    });
+    ph += '</div></div>';
+  });
+  ph += '</section>';
+  $("pulse").innerHTML = ph;
+
+  // ---- Formularz
+  ["fname", "fcompany", "fmail", "fcity", "farea", "fpeople", "fchange"].forEach(function (id) { if (state.f[id]) $(id).value = state.f[id]; });
+  if (state.f.fconsent) $("fconsent").checked = true;
+  $("consentText").innerHTML = esc(CONSENT_TEXT) + (PRIVACY_URL ? ' <a href="' + esc(PRIVACY_URL) + '" target="_blank" rel="noopener">Informacja o przetwarzaniu danych</a>.' : "");
+
+  // ---- Obliczenia
+  function areaScore(a) {
+    var sum = 0, n = 0;
+    for (var i = 0; i < 3; i++) { var v = state.a[a.id + "-" + i]; if (v) { sum += v; n++; } }
+    return n === 3 ? Math.round(((sum / 3) - 1) * 25) : null;
+  }
+  function pulseScore() {
+    var sum = 0, n = 0;
+    for (var i = 0; i < PULSE_Q.length; i++) { var v = state.p["p-" + i]; if (v) { sum += v; n++; } }
+    return n ? { v: Math.round(((sum / n) - 1) / 3 * 100), n: n } : null;
+  }
+  function level(p) { return p < 35 ? "tu najwięcej do zyskania" : p < 65 ? "działa, jest zapas do poprawy" : "mocna strona"; }
+  function pulseLabel(p) { return p >= 67 ? "regularnie sprawdzacie biuro" : p >= 34 ? "sprawdzacie okazjonalnie" : "biuro rzadko bywa badane"; }
+
+  // ---- Radar
+  function radar(scores) {
+    var cx = 190, cy = 168, R = 104, n = AREAS.length;
+    function pt(i, r) { var ang = -Math.PI / 2 + i * 2 * Math.PI / n; return [cx + r * Math.cos(ang), cy + r * Math.sin(ang)]; }
+    var s = '<svg class="radar" viewBox="0 0 380 336" role="img" aria-label="Wykres radarowy: kondycja sześciu obszarów biura w skali 0 do 100">';
+    [25, 50, 75, 100].forEach(function (lv) {
+      var p = []; for (var i = 0; i < n; i++) { var c = pt(i, R * lv / 100); p.push(c[0].toFixed(1) + "," + c[1].toFixed(1)); }
+      s += '<polygon class="ring" points="' + p.join(" ") + '"/>';
+    });
+    for (var i = 0; i < n; i++) { var e = pt(i, R); s += '<line class="axis" x1="' + cx + '" y1="' + cy + '" x2="' + e[0].toFixed(1) + '" y2="' + e[1].toFixed(1) + '"/>'; }
+    s += '<text class="tick" x="' + (cx + 4) + '" y="' + (cy - R * 0.5 + 3) + '">50</text><text class="tick" x="' + (cx + 4) + '" y="' + (cy - R + 3) + '">100</text>';
+    var any = scores.some(function (v) { return v !== null; });
+    if (any) {
+      var poly = scores.map(function (v, i) { var c = pt(i, R * (v === null ? 0 : v) / 100); return c[0].toFixed(1) + "," + c[1].toFixed(1); });
+      s += '<polygon class="area" points="' + poly.join(" ") + '"/>';
+      scores.forEach(function (v, i) {
+        if (v === null) return;
+        var c = pt(i, R * v / 100);
+        s += '<circle class="dot" cx="' + c[0].toFixed(1) + '" cy="' + c[1].toFixed(1) + '" r="5"><title>' + AREAS[i].t + ': ' + v + '/100</title></circle>';
+      });
+    }
+    AREAS.forEach(function (a, i) {
+      var c = pt(i, R + 20), anchor = c[0] < cx - 6 ? "end" : c[0] > cx + 6 ? "start" : "middle";
+      var dy = c[1] < cy - R * 0.9 ? -2 : c[1] > cy + R * 0.9 ? 12 : 4;
+      s += '<text x="' + c[0].toFixed(1) + '" y="' + (c[1] + dy).toFixed(1) + '" text-anchor="' + anchor + '">' + a.short + '</text>';
+    });
+    return s + '</svg>';
+  }
+
+  var scores = [];
+  function render() {
+    var answered = Object.keys(state.a).length + Object.keys(state.p).length;
+    $("pcount").textContent = answered + " / " + TOTAL;
+    $("pfill").style.width = (answered / TOTAL * 100) + "%";
+
+    scores = AREAS.map(areaScore);
+    var done = scores.filter(function (s) { return s !== null; });
+    var ranked = scores.map(function (s, i) { return { s: s, i: i }; }).filter(function (o) { return o.s !== null; }).sort(function (a, b) { return a.s - b.s || a.i - b.i; });
+    var low = ranked.length >= 3 ? [ranked[0].i, ranked[1].i] : [];
+    var avg = done.length ? Math.round(done.reduce(function (a, b) { return a + b; }, 0) / done.length) : null;
+    var pl = pulseScore();
+
+    var o = avg === null
+      ? '<div class="big">–</div><b class="t">Wynik pojawi się po pierwszym obszarze</b><p class="meta">Odpowiedz na trzy stwierdzenia w dowolnym obszarze.</p>'
+      : '<div class="eyebrow">Ogólna kondycja</div><div class="big">' + avg + '<small>/100</small></div><b class="t">' + level(avg) + '</b><p class="meta">Średnia z ' + done.length + ' z ' + AREAS.length + ' ocenionych obszarów.</p>';
+    o += '<div class="pulsebox"><div class="row"><span>Puls biura</span><b>' + (pl ? pl.v + "/100" : "–") + '</b></div><p class="meta">' + (pl ? pulseLabel(pl.v) + (pl.n < PULSE_Q.length ? " (odpowiedzi: " + pl.n + " z " + PULSE_Q.length + ")" : "") : "Odpowiedz na pytania „kiedy ostatnio”.") + '</p></div>';
+    $("overall").innerHTML = o;
+    $("radarBox").innerHTML = radar(scores);
+
+    var ins = $("insight");
+    if (avg !== null && pl && pl.n === PULSE_Q.length && done.length === AREAS.length) {
+      ins.hidden = false;
+      ins.textContent = (avg >= 55 && pl.v < 50)
+        ? "Oceniacie biuro dobrze, ale rzadko sprawdzacie je na danych i w rozmowach. Oceny „z głowy” bywają optymistyczne, więc to dobry kandydat do pomiaru."
+        : (avg < 50 && pl.v >= 60)
+        ? "Regularnie sprawdzacie biuro i widzicie, gdzie jest trudniej. To dobry punkt wyjścia, żeby wybrać, co zmienić najpierw."
+        : (pl.v < 34)
+        ? "Biuro to proces, nie projekt. Najłatwiej zyskać, zaczynając od regularnego sprawdzania, co się w nim dzieje."
+        : "Macie już rytm sprawdzania biura. Kolejny krok to oprzeć go na pomiarach, a nie tylko na wrażeniach.";
+    } else { ins.hidden = true; }
+
+    var r = "";
+    AREAS.forEach(function (a, i) {
+      var s = scores[i], top = low.indexOf(i) > -1;
+      r += '<div class="res' + (top ? " top" : "") + '"><div class="head"><h3>' + a.t + '</h3><span>' + (top ? '<span class="tag">zacznij tutaj</span> ' : "") +
+        '<span class="val">' + (s === null ? "brak odpowiedzi" : s + "/100") + '</span></span></div>' +
+        '<div class="bar"><i style="width:' + (s === null ? 0 : s) + '%"></i></div>' +
+        '<details><summary>Co warto sprawdzić</summary><p class="think">' + a.think + '</p><p class="data"><b>Dane do zebrania:</b> ' + a.data + '.</p></details></div>';
+    });
+    $("results").innerHTML = r;
+    checkForm();
+  }
+
+  function checkForm() {
+    var ok = ["fname", "fcompany", "fmail"].every(function (id) { return $(id).value.trim(); }) && $("fmail").validity.valid && $("fconsent").checked;
+    $("sendBtn").disabled = !ok;
+  }
+
+  $("areas").addEventListener("change", function (e) {
+    if (e.target.type === "radio") { state.a[e.target.name] = parseInt(e.target.value, 10); save(); render(); }
+  });
+  $("pulse").addEventListener("change", function (e) {
+    if (e.target.type === "radio") { state.p[e.target.name] = parseInt(e.target.value, 10); save(); render(); }
+  });
+  $("form").addEventListener("input", function (e) {
+    state.f[e.target.id] = e.target.type === "checkbox" ? e.target.checked : e.target.value;
+    save(); checkForm();
+  });
+
+  function payload() {
+    var sc = {}; AREAS.forEach(function (a, i) { sc[a.id] = scores[i]; });
+    var pl = pulseScore();
+    return {
+      src: SRC, ts: new Date().toISOString(),
+      contact: { name: $("fname").value.trim(), company: $("fcompany").value.trim(), email: $("fmail").value.trim(), city: $("fcity").value.trim(),
+                 areaM2: $("farea").value ? Number($("farea").value) : null, people: $("fpeople").value ? Number($("fpeople").value) : null },
+      change: $("fchange").value.trim(),
+      scores: sc, pulse: pl ? pl.v : null,
+      answers: { areas: state.a, pulse: state.p },
+      consent: true, consentText: CONSENT_TEXT
+    };
+  }
+  function summaryText(p) {
+    var L = ["KARTA AUTODIAGNOZY BIURA · JLL" + (p.src ? " · źródło: " + p.src : ""),
+      "Imię i nazwisko: " + p.contact.name, "Firma: " + p.contact.company, "E-mail: " + p.contact.email];
+    if (p.contact.city) L.push("Lokalizacja: " + p.contact.city);
+    if (p.contact.areaM2) L.push("Powierzchnia: " + p.contact.areaM2 + " m²");
+    if (p.contact.people) L.push("Liczba osób: " + p.contact.people);
+    L.push("", "KONDYCJA OBSZARÓW (0–100, im wyżej tym lepiej)");
+    AREAS.forEach(function (a) { var s = p.scores[a.id]; L.push("- " + a.t + ": " + (s === null ? "brak odpowiedzi" : s + "/100")); });
+    L.push("", "PULS BIURA: " + (p.pulse === null ? "brak odpowiedzi" : p.pulse + "/100"));
+    if (p.change) L.push("", "CO ZMIENIĆ: " + p.change);
+    L.push("", "Zgoda na kontakt w sprawie diagnozy: tak");
+    return L.join("\n");
+  }
+  function showThanks(sent) {
+    var p = payload();
+    $("summary").textContent = summaryText(p);
+    $("thanksTitle").textContent = sent ? "Dziękujemy, zgłoszenie wysłane." : "Zgłoszenie przygotowane.";
+    $("thanksText").textContent = sent
+      ? "Odezwiemy się w sprawie bezpłatnej diagnozy. Poniżej Twoje podsumowanie, możesz je skopiować."
+      : "Ta strona nie wysyła danych automatycznie. Skopiuj podsumowanie i przekaż je prowadzącym albo wyślij mailem.";
+    $("thanks").hidden = false; $("form").hidden = true;
+    $("thanks").scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+  $("form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    if ($("sendBtn").disabled) return;
+    if ($("fweb").value) { showThanks(true); return; }   // pułapka na boty
+    if (!ENDPOINT) { showThanks(false); return; }
+    $("sendBtn").disabled = true; $("formhint").textContent = "Wysyłam…";
+    fetch(ENDPOINT, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload()) })
+      .then(function (r) { if (!r.ok) throw new Error("http " + r.status); showThanks(true); })
+      .catch(function () {
+        $("formhint").textContent = "Nie udało się wysłać. Spróbuj ponownie albo skopiuj podsumowanie.";
+        $("sendBtn").disabled = false;
+        var b = document.createElement("button"); b.type = "button"; b.className = "btn ghost"; b.textContent = "Pokaż podsumowanie do skopiowania";
+        b.onclick = function () { showThanks(false); };
+        if (!$("form").querySelector(".fallback")) { b.classList.add("fallback"); $("form").querySelector(".actions").appendChild(b); }
+      });
+  });
+  $("copyBtn").addEventListener("click", function () {
+    var txt = $("summary").textContent;
+    function sel() {
+      var rg = document.createRange(); rg.selectNodeContents($("summary"));
+      var s = window.getSelection(); s.removeAllRanges(); s.addRange(rg);
+      $("copyhint").textContent = "Zaznaczono tekst, skopiuj go ręcznie.";
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(txt).then(function () { $("copyhint").textContent = "Skopiowano."; }, sel);
+    } else { sel(); }
+  });
+
+  render();
+})();
+</script>
+
+</body>
+</html>
